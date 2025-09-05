@@ -1,0 +1,278 @@
+{% extends 'workshop_app/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - FOSSEE Workshops{% endblock %}
+
+{% block extra-dependencies %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="welcome-title">
+                            <i class="fas fa-sun text-warning me-3"></i>
+                            Welcome back, {{ user.get_full_name|title }}!
+                        </h1>
+                        <p class="welcome-subtitle">
+                            {% if is_instructor %}
+                                Ready to inspire the next generation of learners?
+                            {% else %}
+                                Ready to organize amazing workshops?
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="current-date">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            {{ current_date|date:"l, F j, Y" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card stat-card-primary">
+                <div class="stat-card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3 class="stat-card-number">{{ total_workshops }}</h3>
+                        <p class="stat-card-label">Total Workshops</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card stat-card-success">
+                <div class="stat-card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3 class="stat-card-number">{{ accepted_workshops }}</h3>
+                        <p class="stat-card-label">Accepted</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card stat-card-warning">
+                <div class="stat-card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3 class="stat-card-number">{{ pending_workshops }}</h3>
+                        <p class="stat-card-label">Pending</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card stat-card-info">
+                <div class="stat-card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3 class="stat-card-number">{{ upcoming_workshops|length }}</h3>
+                        <p class="stat-card-label">Upcoming</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5 class="chart-card-title">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        Workshop Trends (Last 12 Months)
+                    </h5>
+                </div>
+                <div class="chart-card-body">
+                    <canvas id="workshopTrendsChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-lg-5">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5 class="chart-card-title">
+                        <i class="fas fa-chart-pie text-success me-2"></i>
+                        Workshop Status Distribution
+                    </h5>
+                </div>
+                <div class="chart-card-body">
+                    <canvas id="statusDistributionChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities Row -->
+    <div class="row">
+        <div class="col-xl-6 col-lg-6">
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h5 class="activity-card-title">
+                        <i class="fas fa-calendar-alt text-info me-2"></i>
+                        Upcoming Workshops
+                    </h5>
+                </div>
+                <div class="activity-card-body">
+                    {% if upcoming_workshops %}
+                        {% for workshop in upcoming_workshops %}
+                        <div class="activity-item">
+                            <div class="activity-item-icon">
+                                <i class="fas fa-calendar-check text-success"></i>
+                            </div>
+                            <div class="activity-item-content">
+                                <h6 class="activity-item-title">{{ workshop.workshop_type.name }}</h6>
+                                <p class="activity-item-details">
+                                    <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                    {{ workshop.coordinator.profile.institute }}
+                                    <span class="activity-item-date">
+                                        <i class="fas fa-clock text-muted me-1"></i>
+                                        {{ workshop.date|date:"M j, Y" }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-activity">
+                            <i class="fas fa-calendar-times text-muted"></i>
+                            <p>No upcoming workshops</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-6 col-lg-6">
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h5 class="activity-card-title">
+                        <i class="fas fa-history text-warning me-2"></i>
+                        Recent Workshops
+                    </h5>
+                </div>
+                <div class="activity-card-body">
+                    {% if recent_workshops %}
+                        {% for workshop in recent_workshops %}
+                        <div class="activity-item">
+                            <div class="activity-item-icon">
+                                <i class="fas fa-chalkboard text-primary"></i>
+                            </div>
+                            <div class="activity-item-content">
+                                <h6 class="activity-item-title">{{ workshop.workshop_type.name }}</h6>
+                                <p class="activity-item-details">
+                                    <span class="badge badge-{{ workshop.get_status|lower }}">
+                                        {{ workshop.get_status }}
+                                    </span>
+                                    <span class="activity-item-date">
+                                        <i class="fas fa-clock text-muted me-1"></i>
+                                        {{ workshop.date|date:"M j, Y" }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-activity">
+                            <i class="fas fa-history text-muted"></i>
+                            <p>No recent workshops</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Workshop Trends Chart
+const ctx1 = document.getElementById('workshopTrendsChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'line',
+    data: {
+        labels: {{ months|safe }},
+        datasets: [{
+            label: 'Workshops',
+            data: {{ workshop_counts|safe }},
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0,0,0,0.1)'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+
+// Status Distribution Chart
+const ctx2 = document.getElementById('statusDistributionChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['Accepted', 'Pending', 'Deleted'],
+        datasets: [{
+            data: [{{ accepted_workshops }}, {{ pending_workshops }}, {{ total_workshops|add:"-"|add:accepted_workshops|add:"-"|add:pending_workshops }}],
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

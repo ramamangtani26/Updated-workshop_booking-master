@@ -1,0 +1,316 @@
+{% extends 'workshop_app/base.html' %}
+{% load static %}
+
+{% block title %}Workshop Search - FOSSEE Workshops{% endblock %}
+
+{% block extra-dependencies %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Search Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="search-header">
+                <h1 class="search-title">
+                    <i class="fas fa-search text-primary me-3"></i>
+                    Find Your Perfect Workshop
+                </h1>
+                <p class="search-subtitle">
+                    Discover workshops across India with our advanced search and filtering system
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="search-form-card">
+                <form method="GET" class="search-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="q" class="form-label">
+                                <i class="fas fa-search text-primary me-2"></i>
+                                Search Workshops
+                            </label>
+                            <input type="text" class="form-control search-input" id="q" name="q" 
+                                   value="{{ query }}" placeholder="Search by name, instructor, institute, or location...">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="state" class="form-label">
+                                <i class="fas fa-map-marker-alt text-success me-2"></i>
+                                State
+                            </label>
+                            <select class="form-select select2" id="state" name="state">
+                                <option value="">All States</option>
+                                {% for code, name in states_list %}
+                                    <option value="{{ code }}" {% if state == code %}selected{% endif %}>
+                                        {{ name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="workshop_type" class="form-label">
+                                <i class="fas fa-chalkboard text-info me-2"></i>
+                                Workshop Type
+                            </label>
+                            <select class="form-select select2" id="workshop_type" name="workshop_type">
+                                <option value="">All Types</option>
+                                {% for wt in workshop_types %}
+                                    <option value="{{ wt.id }}" {% if workshop_type == wt.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ wt.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="date_from" class="form-label">
+                                <i class="fas fa-calendar text-warning me-2"></i>
+                                From Date
+                            </label>
+                            <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="date_to" class="form-label">
+                                <i class="fas fa-calendar text-warning me-2"></i>
+                                To Date
+                            </label>
+                            <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="difficulty" class="form-label">
+                                <i class="fas fa-signal text-danger me-2"></i>
+                                Difficulty Level
+                            </label>
+                            <select class="form-select" id="difficulty" name="difficulty">
+                                <option value="">All Levels</option>
+                                {% for level, name in difficulty_levels %}
+                                    <option value="{{ level }}" {% if difficulty == level %}selected{% endif %}>
+                                        {{ name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="category" class="form-label">
+                                <i class="fas fa-tags text-secondary me-2"></i>
+                                Category
+                            </label>
+                            <select class="form-select select2" id="category" name="category">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.id }}" {% if category == cat.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ cat.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg search-btn">
+                                <i class="fas fa-search me-2"></i>
+                                Search Workshops
+                            </button>
+                            <a href="{% url 'workshop_app:workshop_search' %}" class="btn btn-outline-secondary btn-lg ms-3">
+                                <i class="fas fa-refresh me-2"></i>
+                                Clear Filters
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    {% if query or state or workshop_type or date_from or date_to or difficulty or category %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="results-header">
+                <h3 class="results-title">
+                    <i class="fas fa-list text-success me-2"></i>
+                    Search Results
+                </h3>
+                <div class="results-count">
+                    <span class="badge bg-primary">{{ workshops.paginator.count }}</span> workshops found
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Workshops Grid -->
+    <div class="row">
+        {% if workshops %}
+            {% for workshop in workshops %}
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                <div class="workshop-card">
+                    <div class="workshop-card-header">
+                        <div class="workshop-type-badge">
+                            <i class="fas fa-chalkboard text-white me-2"></i>
+                            {{ workshop.workshop_type.name }}
+                        </div>
+                        <div class="workshop-status">
+                            <span class="status-badge status-{{ workshop.get_status|lower }}">
+                                {{ workshop.get_status }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="workshop-card-body">
+                        <h5 class="workshop-title">{{ workshop.workshop_type.name }}</h5>
+                        
+                        <div class="workshop-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar text-primary me-2"></i>
+                                <span>{{ workshop.date|date:"F j, Y" }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt text-success me-2"></i>
+                                <span>{{ workshop.coordinator.profile.institute }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <i class="fas fa-user text-info me-2"></i>
+                                <span>{{ workshop.coordinator.get_full_name }}</span>
+                            </div>
+                            
+                            {% if workshop.coordinator.profile.location %}
+                            <div class="detail-item">
+                                <i class="fas fa-location-dot text-warning me-2"></i>
+                                <span>{{ workshop.coordinator.profile.location }}, {{ workshop.coordinator.profile.get_state_display }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if workshop.workshop_type.difficulty_level %}
+                        <div class="workshop-difficulty">
+                            <span class="difficulty-badge difficulty-{{ workshop.workshop_type.difficulty_level }}">
+                                <i class="fas fa-signal me-1"></i>
+                                {{ workshop.workshop_type.get_difficulty_level_display }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="workshop-card-footer">
+                        <a href="{% url 'workshop_app:workshop_details' workshop.id %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>
+                            View Details
+                        </a>
+                        
+                        {% if workshop.workshop_type.category %}
+                        <span class="category-tag">
+                            <i class="fas fa-tag me-1"></i>
+                            {{ workshop.workshop_type.category.name }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="no-results">
+                    <i class="fas fa-search text-muted"></i>
+                    <h3>No workshops found</h3>
+                    <p>Try adjusting your search criteria or browse all available workshops.</p>
+                    <a href="{% url 'workshop_app:workshop_search' %}" class="btn btn-primary">
+                        <i class="fas fa-list me-2"></i>
+                        View All Workshops
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if workshops.has_other_pages %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Workshop search results pages">
+                <ul class="pagination justify-content-center">
+                    {% if workshops.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if state %}&state={{ state }}{% endif %}{% if workshop_type %}&workshop_type={{ workshop_type }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}{% if category %}&category={{ category }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ workshops.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if state %}&state={{ state }}{% endif %}{% if workshop_type %}&workshop_type={{ workshop_type }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}{% if category %}&category={{ category }}{% endif %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in workshops.paginator.page_range %}
+                        {% if workshops.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > workshops.number|add:'-3' and num < workshops.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if state %}&state={{ state }}{% endif %}{% if workshop_type %}&workshop_type={{ workshop_type }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}{% if category %}&category={{ category }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if workshops.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ workshops.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if state %}&state={{ state }}{% endif %}{% if workshop_type %}&workshop_type={{ workshop_type }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}{% if category %}&category={{ category }}{% endif %}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ workshops.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if state %}&state={{ state }}{% endif %}{% if workshop_type %}&workshop_type={{ workshop_type }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}{% if category %}&category={{ category }}{% endif %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+$(document).ready(function() {
+    // Initialize Select2 for better dropdown experience
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        width: '100%'
+    });
+    
+    // Auto-submit form when filters change
+    $('.search-form select, .search-form input[type="date"]').change(function() {
+        if ($(this).val()) {
+            $('.search-form').submit();
+        }
+    });
+    
+    // Add loading state to search button
+    $('.search-form').on('submit', function() {
+        $('.search-btn').html('<i class="fas fa-spinner fa-spin me-2"></i>Searching...');
+        $('.search-btn').prop('disabled', true);
+    });
+});
+</script>
+{% endblock %}

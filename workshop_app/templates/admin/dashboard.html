@@ -1,0 +1,377 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dashboard | Workshop Booking System{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1 class="dashboard-title">📊 Workshop Management Dashboard</h1>
+    
+    <!-- Statistics Cards -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-number">{{ total_workshops }}</div>
+            <div class="stat-label">Total Workshops</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-number">{{ pending_workshops }}</div>
+            <div class="stat-label">Pending Workshops</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-number">{{ accepted_workshops }}</div>
+            <div class="stat-label">Accepted Workshops</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">👨‍🏫</div>
+            <div class="stat-number">{{ instructors }}</div>
+            <div class="stat-label">Instructors</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-number">{{ coordinators }}</div>
+            <div class="stat-label">Coordinators</div>
+        </div>
+    </div>
+    
+    <!-- Recent Workshops -->
+    <div class="dashboard-section">
+        <h2 class="section-title">📅 Recent Workshops</h2>
+        <div class="workshop-list">
+            {% for workshop in recent_workshops %}
+            <div class="workshop-item">
+                <div class="workshop-info">
+                    <h3>{{ workshop.workshop_type.name }}</h3>
+                    <p><strong>Date:</strong> {{ workshop.date|date:"M d, Y" }}</p>
+                    <p><strong>Coordinator:</strong> {{ workshop.coordinator.get_full_name }}</p>
+                    {% if workshop.instructor %}
+                        <p><strong>Instructor:</strong> {{ workshop.instructor.get_full_name }}</p>
+                    {% else %}
+                        <p><strong>Instructor:</strong> <span class="not-assigned">Not Assigned</span></p>
+                    {% endif %}
+                </div>
+                <div class="workshop-status">
+                    {% if workshop.status == 0 %}
+                        <span class="status-badge pending">Pending</span>
+                    {% elif workshop.status == 1 %}
+                        <span class="status-badge accepted">Accepted</span>
+                    {% else %}
+                        <span class="status-badge rejected">Rejected</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>No workshops found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Popular Workshop Types -->
+    <div class="dashboard-section">
+        <h2 class="section-title">🔥 Popular Workshop Types</h2>
+        <div class="workshop-types-list">
+            {% for workshop_type in workshop_types %}
+            <div class="workshop-type-item">
+                <div class="workshop-type-info">
+                    <h3>{{ workshop_type.name }}</h3>
+                    <p>{{ workshop_type.description|truncatewords:20 }}</p>
+                    <div class="workshop-type-meta">
+                        <span class="duration">⏱️ {{ workshop_type.duration }} day{{ workshop_type.duration|pluralize }}</span>
+                        <span class="difficulty">📊 {{ workshop_type.get_difficulty_level_display }}</span>
+                    </div>
+                </div>
+                <div class="workshop-type-count">
+                    <span class="count-badge">{{ workshop_type.workshop_count }}</span>
+                    <span class="count-label">workshops</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>No workshop types found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="dashboard-section">
+        <h2 class="section-title">⚡ Quick Actions</h2>
+        <div class="quick-actions">
+            <a href="{% url 'admin:workshop_app_workshop_add' %}" class="action-button">
+                <span class="action-icon">➕</span>
+                <span class="action-text">Add Workshop</span>
+            </a>
+            <a href="{% url 'admin:workshop_app_workshoptype_add' %}" class="action-button">
+                <span class="action-icon">📝</span>
+                <span class="action-text">Add Workshop Type</span>
+            </a>
+            <a href="{% url 'admin:workshop_app_profile_add' %}" class="action-button">
+                <span class="action-icon">👤</span>
+                <span class="action-text">Add User</span>
+            </a>
+            <a href="{% url 'admin:workshop_app_workshop_changelist' %}" class="action-button">
+                <span class="action-icon">📋</span>
+                <span class="action-text">Manage Workshops</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.dashboard-title {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 40px;
+    font-size: 2.5em;
+    font-weight: 300;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: white;
+    padding: 30px 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+    font-size: 2em;
+    margin-bottom: 15px;
+}
+
+.stat-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.dashboard-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.section-title {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    padding: 20px 30px;
+    margin: 0;
+    font-weight: 400;
+    font-size: 1.3em;
+}
+
+.workshop-list, .workshop-types-list {
+    padding: 20px 30px;
+}
+
+.workshop-item, .workshop-type-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #ecf0f1;
+    transition: background-color 0.3s ease;
+}
+
+.workshop-item:hover, .workshop-type-item:hover {
+    background-color: #f8f9fa;
+}
+
+.workshop-item:last-child, .workshop-type-item:last-child {
+    border-bottom: none;
+}
+
+.workshop-info h3, .workshop-type-info h3 {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+}
+
+.workshop-info p, .workshop-type-info p {
+    margin: 5px 0;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.workshop-type-meta {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.workshop-type-meta span {
+    background: #ecf0f1;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #2c3e50;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-badge.pending {
+    background: #f39c12;
+    color: white;
+}
+
+.status-badge.accepted {
+    background: #27ae60;
+    color: white;
+}
+
+.status-badge.rejected {
+    background: #e74c3c;
+    color: white;
+}
+
+.not-assigned {
+    color: #e74c3c;
+    font-style: italic;
+}
+
+.workshop-type-count {
+    text-align: center;
+}
+
+.count-badge {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+    color: #3498db;
+}
+
+.count-label {
+    font-size: 12px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px 30px;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.action-button:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+    color: white;
+}
+
+.action-icon {
+    font-size: 1.5em;
+    margin-right: 15px;
+}
+
+.action-text {
+    font-weight: 500;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .workshop-item, .workshop-type-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .workshop-type-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,300 @@
+{% extends 'workshop_app/base.html' %}
+{% load static %}
+
+{% block title %}Welcome to FOSSEE Workshops - IIT Bombay{% endblock %}
+
+{% block extra-dependencies %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h1 class="hero-title">
+                    Transform Learning with
+                    <span class="text-gradient">FOSSEE Workshops</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Join thousands of educators and students across India in our cutting-edge workshop platform. 
+                    Discover, organize, and participate in world-class technical workshops.
+                </p>
+                <div class="hero-buttons">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'workshop_app:dashboard' %}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{% url 'workshop_app:register' %}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-user-plus me-2"></i>Get Started
+                        </a>
+                        <a href="{% url 'workshop_app:login' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Workshops</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Cities</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Participants</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="hero-image">
+                    <img src="{% static 'workshop_app/img/hero-illustration.svg' %}" alt="Workshop Illustration" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12" data-aos="fade-up">
+                <h2 class="section-title">Why Choose FOSSEE Workshops?</h2>
+                <p class="section-subtitle">Experience the future of workshop management with our advanced platform</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Advanced Analytics</h4>
+                    <p>Real-time insights into workshop performance, participant engagement, and success metrics with interactive charts and reports.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4>Smart Search</h4>
+                    <p>Find the perfect workshop with our intelligent search system featuring filters by location, type, difficulty, and more.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4>Real-time Communication</h4>
+                    <p>Built-in chat system for seamless communication between coordinators and instructors throughout the workshop process.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h4>Rating System</h4>
+                    <p>Comprehensive feedback and rating system to help improve workshop quality and participant satisfaction.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>Mobile Responsive</h4>
+                    <p>Fully responsive design that works perfectly on all devices - desktop, tablet, and mobile phones.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Secure & Reliable</h4>
+                    <p>Enterprise-grade security with data encryption, user authentication, and regular backups for your peace of mind.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12" data-aos="fade-up">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Get started in just three simple steps</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h4>Create Account</h4>
+                    <p>Sign up as either a coordinator or instructor. Complete your profile with your expertise and preferences.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h4>Propose or Create</h4>
+                    <p>Coordinators can propose workshop dates, while instructors create workshop types and manage schedules.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>Launch & Manage</h4>
+                    <p>Execute your workshops with our comprehensive management tools and real-time communication features.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8" data-aos="fade-up">
+                <h2 class="cta-title">Ready to Transform Your Workshop Experience?</h2>
+                <p class="cta-subtitle">
+                    Join the FOSSEE community and take your workshops to the next level with our cutting-edge platform.
+                </p>
+                <div class="cta-buttons">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'workshop_app:dashboard' %}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{% url 'workshop_app:register' %}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-user-plus me-2"></i>Start Free Trial
+                        </a>
+                        <a href="{% url 'workshop_app:workshop_search' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-search me-2"></i>Browse Workshops
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<section class="footer-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <h5 class="footer-title">About FOSSEE</h5>
+                <p class="footer-text">
+                    FOSSEE (Free/Libre and Open Source Software for Education) is an initiative of IIT Bombay 
+                    to promote the use of open source software in education and research.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="footer-title">Platform</h6>
+                <ul class="footer-links">
+                    <li><a href="{% url 'workshop_app:workshop_search' %}">Search Workshops</a></li>
+                    <li><a href="{% url 'statistics_app:public' %}">Statistics</a></li>
+                    <li><a href="{% url 'workshop_app:workshop_type_list' %}">Workshop Types</a></li>
+                    <li><a href="{% url 'workshop_app:register' %}">Register</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="footer-title">Support</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <h6 class="footer-title">Contact Information</h6>
+                <div class="contact-info">
+                    <p><i class="fas fa-map-marker-alt me-2"></i>IIT Bombay, Mumbai, Maharashtra</p>
+                    <p><i class="fas fa-envelope me-2"></i>fossee@iitb.ac.in</p>
+                    <p><i class="fas fa-phone me-2"></i>+91 22 2576 0000</p>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="footer-divider">
+        
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="footer-copyright">
+                    © 2025 FOSSEE, IIT Bombay. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="footer-powered-by">
+                    Powered by <strong>Django</strong> & <strong>Bootstrap</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Initialize AOS (Animate On Scroll)
+AOS.init({
+    duration: 1000,
+    once: true,
+    offset: 100
+});
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
