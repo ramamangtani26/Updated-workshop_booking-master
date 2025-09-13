@@ -9,13 +9,6 @@ This is an **enhanced version** of the original FOSSEE Workshop Booking System f
 ### Django Administration Interface
 
 The enhanced system includes a comprehensive Django administration panel that allows administrators to manage all aspects of the workshop booking system.
-
-![Django Admin Dashboard](docs/admin_dashboard.png)
-*Figure 1: Django administration dashboard showing all available models and management options*
-
-![Attachment File Management](docs/attachment_management.png)
-*Figure 2: Adding workshop attachments with detailed instructions and file management*
-
 ### Key Admin Features
 
 - **User Management**: Complete control over user accounts, groups, and permissions
